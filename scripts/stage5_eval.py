@@ -8,8 +8,8 @@ import time
 import wave
 
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
-from pi_deploy.asr_client import VoskConnection, stream_utterance, SAMPLE_RATE, CHUNK_FRAMES
-from pi_deploy.speaker_id import SpeakerIdentifier
+from pi_deploy_rm.asr_client import VoskConnection, stream_utterance, SAMPLE_RATE, CHUNK_FRAMES
+from pi_deploy_rm.speaker_id import SpeakerIdentifier
 
 SPLIT_DIR = os.path.join(os.path.dirname(__file__), "..", "split")
 

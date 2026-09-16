@@ -25,7 +25,11 @@ async def recognize(websocket):
                     rec.SetSpkModel(spk_model)
                 elif 'eof' in msg:
                     if rec:
-                        await websocket.send(rec.FinalResult())
+                        final_res = rec.FinalResult()
+                        res_json = json.loads(final_res)
+                        if "text" in res_json and res_json["text"]:
+                            print(f"\n[ASR FINAL] -> {res_json['text']}")
+                        await websocket.send(final_res)
                     break
             else:
                 if rec:
@@ -33,14 +37,22 @@ async def recognize(websocket):
                         await websocket.send(json.dumps({"ack": "first_audio_byte"}))
                         audio_received = True
                     if rec.AcceptWaveform(message):
-                        await websocket.send(rec.Result())
+                        res_str = rec.Result()
+                        res_json = json.loads(res_str)
+                        if "text" in res_json and res_json["text"]:
+                            print(f"\n[ASR FINAL] -> {res_json['text']}")
+                        await websocket.send(res_str)
                     else:
-                        await websocket.send(rec.PartialResult())
+                        res_str = rec.PartialResult()
+                        res_json = json.loads(res_str)
+                        if "partial" in res_json and res_json["partial"]:
+                            print(f"[ASR Stream] {res_json['partial']}")
+                        await websocket.send(res_str)
     except websockets.exceptions.ConnectionClosed:
         print("Client disconnected")
 
 async def main():
-    async with websockets.serve(recognize, "localhost", 2700):
+    async with websockets.serve(recognize, "0.0.0.0", 2700):
         print("Vosk WebSocket server started on ws://localhost:2700")
         await asyncio.Future()  # run forever
 
